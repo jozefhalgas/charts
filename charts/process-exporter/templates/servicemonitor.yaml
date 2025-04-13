@@ -1,0 +1,24 @@
+{{- if .Values.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "process-exporter.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "process-exporter.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "process-exporter.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  endpoints:
+    - port: metrics
+      interval: 30s
+      path: /metrics
+      {{- if .Values.serviceMonitor.metricRelabelings }}
+      metricRelabelings: {{- include "common.tplvalues.render" ( dict "value" .Values.serviceMonitor.metricRelabelings "context" $) | nindent 6 }}
+      {{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+{{- end }}
