@@ -1,0 +1,104 @@
+## @section Common
+## @param nameOverride String to partially override gitea.fullname template (will maintain the release name)
+nameOverride: ""
+## @param fullnameOverride String to fully override gitea.fullname template
+fullnameOverride: ""
+## @param extraDeploy Array of extra objects to deploy with the release
+extraDeploy: []
+
+## @section Process exporter
+## @param image.registry Process exporter image registry
+## @param image.repository Process exporter image repository
+## @param image.tag [default: .Chart.AppVersion] Process exporter image tag
+## @param image.digest Image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag
+## @param image.pullPolicy Process exporter image pull policy
+image:
+  registry: docker.io
+  repository: ncabatoff/process-exporter
+  tag: ""
+  digest: "sha256:6f0549dc24e97a51a3a3524271082cfa2f44352d96fd6a038bfa00659470639a"  # 0.8.5
+  pullPolicy: IfNotPresent
+## @param resources Set container requests and limits for different resources like CPU or memory
+## Example:
+## resources:
+##   requests:
+##     cpu: 100m
+##     memory: 128Mi
+##   limits:
+##     cpu: 200m
+##     memory: 256Mi
+##
+
+## @param config.threads specifies if metrics will be broken down by thread name as well as group name.
+## @param config.nameMatchers [array] Check [configuration and group naming](https://github.com/ncabatoff/process-exporter/tree/master?tab=readme-ov-file#configuration-and-group-naming)
+config:
+  threads: false
+  nameMatchers:
+    - name: "{{.Comm}}"
+      cmdline:
+        - '.+'
+
+resources: {}
+## @param nodeSelector Process exporter node labels for pod assignment
+## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
+
+nodeSelector: {}
+## @param tolerations Process exporter tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+
+tolerations: []
+## @param affinity Process exporter affinity for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+
+affinity: {}
+## @param livenessProbe.enabled Enable livenessProbe on Process exporter containers
+## @param livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+## @param livenessProbe.periodSeconds Period seconds for livenessProbe
+## @param livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+## @param livenessProbe.failureThreshold Failure threshold for livenessProbe
+## @param livenessProbe.successThreshold Success threshold for livenessProbe
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  timeoutSeconds: 30
+  periodSeconds: 30
+  successThreshold: 1
+  failureThreshold: 5
+## @param readinessProbe.enabled Enable readinessProbe on Process exporter containers
+## @param readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+## @param readinessProbe.periodSeconds Period seconds for readinessProbe
+## @param readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+## @param readinessProbe.failureThreshold Failure threshold for readinessProbe
+## @param readinessProbe.successThreshold Success threshold for readinessProbe
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  timeoutSeconds: 30
+  periodSeconds: 30
+  successThreshold: 1
+  failureThreshold: 5
+
+## @param extraArgs Additional container arguments
+extraArgs: []
+## @section Traffic exposure
+## @param service.type Kubernetes service type
+## @param service.port Kubernetes service HTTP port
+service:
+  type: ClusterIP
+  port: 9256
+
+## @section Metrics
+## @param serviceMonitor.enabled Specify if a ServiceMonitor will be deployed for Prometheus Operator
+## @param serviceMonitor.metricRelabelings MetricRelabelConfigs to apply to samples before ingestion
+serviceMonitor:
+  enabled: true
+  metricRelabelings: []
+#    - action: drop
+#      regex: namedprocess_namegroup_(context_switches_total|major_page_faults_total|minor_page_faults_total|states|threads_wchan|worst_fd_ratio)
+#      sourceLabels:
+#        - __name__
+
+## @section Other
+## @param serviceAccount.create Specifies whether a ServiceAccount should be created
+serviceAccount:
+  create: true
