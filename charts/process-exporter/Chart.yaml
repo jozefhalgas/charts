@@ -3,7 +3,7 @@ name: process-exporter
 description: A Helm chart for process-exporter
 type: application
 version: 1.0.0
-appVersion: 0.8.5
+appVersion: 0.8.6
 home: https://github.com/kir4h/charts/tree/master/charts/process-exporter
 dependencies:
   - name: common
